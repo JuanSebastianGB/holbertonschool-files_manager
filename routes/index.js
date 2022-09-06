@@ -5,8 +5,8 @@ const router = (app) => {
   const route = express.Router();
   app.use(express.json());
   app.use('/', route);
-  app.get('/status', AppController.getStatus());
-  app.get('/stats', AppController.getStats());
+  app.get('/status', (req, res) => AppController.getStatus(req, res));
+  app.get('/stats', (req, res) => AppController.getStats(req, res));
 };
 
 export default router;
