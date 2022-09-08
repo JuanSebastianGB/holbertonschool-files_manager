@@ -1,5 +1,5 @@
 import sha1 from 'sha1';
-import DBClient from '../utils/db';
+import dbClient from '../utils/db';
 
 class UsersController {
   /**
@@ -12,12 +12,13 @@ class UsersController {
     if (!req.body.password) res.status(400).json({ error: 'Missing password' });
 
     const { email } = req.body;
-    const userEmail = await DBClient.db.collection.findOne({ email });
+    const userEmail = await dbClient.db.collection('users').find({ email });
+    console.log(userEmail);
     if (userEmail) res.status(400).json({ error: 'Already exist' });
     const { password } = req.body;
     const hashedPassword = sha1(password);
 
-    const insertedUserId = await DBClient.db
+    const insertedUserId = await dbClient.db
       .collection('users')
       .insertOne({ email: userEmail, password: hashedPassword });
     res.status(201).json({ id: insertedUserId, email: userEmail });
