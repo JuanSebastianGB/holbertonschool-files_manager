@@ -12,7 +12,8 @@ class DBClient {
   }
 
   isAlive() {
-    return this.client.isConnected();
+    if (this.client.isConnected()) return true;
+    return false;
   }
 
   async nbUsers() {
@@ -21,6 +22,7 @@ class DBClient {
   }
 
   async nbFiles() {
+    this.db = this.client.db(this.database);
     const files = await this.db.collection('files');
     return files.countDocuments();
   }

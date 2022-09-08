@@ -8,20 +8,21 @@ class UsersController {
    * @param res - The response object.
    */
   static async postNew(req, res) {
-    if (!req.body.email) res.status(400).json({ error: 'Missing email' });
-    if (!req.body.password) res.status(400).json({ error: 'Missing password' });
+    const { email, password } = req.body;
+    if (!email) return res.status(400).json({ error: 'Missing email' });
+    if (!password) return res.status(400).json({ error: 'Missing password' });
+    const userSearched = await dbClient.db.collection('users').find({ email });
 
-    const { email } = req.body;
-    const userEmail = await dbClient.db.collection('users').find({ email });
-    console.log(userEmail);
-    if (userEmail) res.status(400).json({ error: 'Already exist' });
-    const { password } = req.body;
+    if (userSearched) return res.status(400).json({ error: 'Already exist' });
     const hashedPassword = sha1(password);
 
-    const insertedUserId = await dbClient.db
+    const insertedUser = await dbClient.db
       .collection('users')
-      .insertOne({ email: userEmail, password: hashedPassword });
-    res.status(201).json({ id: insertedUserId, email: userEmail });
+      .insertOne({ email, password: hashedPassword });
+    return res.status(201).json({
+      id: insertedUser.ops[0]._id,
+      email: insertedUser.ops[0].email,
+    });
   }
 }
 export default UsersController;
