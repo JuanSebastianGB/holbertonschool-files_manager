@@ -1,5 +1,15 @@
-import sha1 from 'sha1';
-import dbClient from '../utils/db';
+import { ObjectId } from 'mongodb';
+import crypto from 'crypto';
+
+const dbClient = require('../utils/db');
+const redisClient = require('../utils/redis');
+
+const hashPasswd = (pwd) => {
+  const hash = crypto.createHash('sha1');
+  const data = hash.update(pwd, 'utf-8');
+  const genHash = data.digest('hex');
+  return genHash;
+};
 
 class UsersController {
   /**
@@ -16,8 +26,7 @@ class UsersController {
     if (userSearched.length > 0) {
       return res.status(400).json({ error: 'Already exist' });
     }
-    const hashedPassword = sha1(password);
-
+    const hashedPassword = hashPasswd(password);
     const insertedUser = await dbClient.db
       .collection('users')
       .insertOne({ email, password: hashedPassword });
@@ -26,5 +35,30 @@ class UsersController {
       email: insertedUser.ops[0].email,
     });
   }
+
+  /**
+   * It gets the user's session from the database and returns it to the client
+   * @param req - The request object.
+   * @param res - The response object.
+   * @returns The user's id and email.
+   */
+  static async getMe(req, res) {
+    const key = req.header('X-Token');
+    const session = await redisClient.get(`auth_${key}`);
+    if (!key || key.length === 0) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    if (session) {
+      const search = await dbClient.db
+        .collection('users')
+        .find({ _id: ObjectId(session) })
+        .toArray();
+      return res
+        .status(200)
+        .json({ id: search[0]._id, email: search[0].email });
+    }
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 }
+
 export default UsersController;
