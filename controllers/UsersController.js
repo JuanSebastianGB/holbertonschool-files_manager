@@ -1,9 +1,14 @@
 import { ObjectId } from 'mongodb';
 import crypto from 'crypto';
 
-const dbClient = require('../utils/db');
-const redisClient = require('../utils/redis');
+import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
+/**
+ * It takes a string, hashes it, and returns the hash
+ * @param pwd - The password to be hashed.
+ * @returns The hashed password.
+ */
 const hashPasswd = (pwd) => {
   const hash = crypto.createHash('sha1');
   const data = hash.update(pwd, 'utf-8');
