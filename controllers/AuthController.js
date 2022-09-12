@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 
+import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
+
 const crypto = require('crypto');
-const redisClient = require('../utils/redis');
-const dbClient = require('../utils/db');
 
 const error = { error: 'Unauthorized' };
 
