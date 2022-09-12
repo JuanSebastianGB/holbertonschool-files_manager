@@ -5,7 +5,7 @@ import redisClient from '../utils/redis';
 
 const crypto = require('crypto');
 
-const error = { error: 'Unauthorized' };
+const error = 'Unauthorized';
 
 /**
  * It takes a string, hashes it, and returns the hash
