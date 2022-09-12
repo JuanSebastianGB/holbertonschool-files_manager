@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  database:
+    image: mongo
+    # environment:
+    #   - MONGO_INITDB_DATABASE=files_manger
+    #   - MONGO_INITDB_ROOT_USERNAME=root
+    #   - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - db-data:/data/db
+      - mongo-config:/data/configdb
+    ports:
+      - '27017:27017'
+  redis:
+    image: "redis:alpine"
+    command: redis-server
+    ports:
+      - "6379:6379"
+    # expose:
+    #   - "6379"
+    volumes:
+      - redis-data:/data
+      - redis-conf:/usr/local/etc/redis/redis.conf
+volumes:
+  db-data:
+  mongo-config:
+  redis-data:
+  redis-conf:
